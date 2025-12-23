@@ -70,7 +70,7 @@ Two primary clustering techniques were employed to group customers based on thei
    ```
 3. Clone this repository:  
    ```bash
-   git clone https://github.com/yourusername/Text-Mining-TripAdvisor.git
+   git clone https://github.com/raminBadri/Text-Mining-TripAdvisor.git
    ```
 4. Open the project in **PyCharm IDE** or run the scripts/notebooks to explore the text mining and clustering processes.
 
