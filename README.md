@@ -57,7 +57,7 @@ Two primary clustering techniques were employed to group customers based on thei
 
 ## 📁 Repository Structure
 
-- `reports/`: Detailed project report and documentation.
+- `report/`: Detailed project report and documentation.
 - `src/`: Source code files for data processing and clustering.
 - `README.md`: This file.
 
