@@ -11,14 +11,14 @@ from sklearn.metrics.pairwise import cosine_similarity
 from scipy.cluster.hierarchy import ward, dendrogram
 import random
 
-# initialize
+# Initialize variables
 path = "C:/Users/vaio/Desktop/ramin-project/source/TripAdvisor_First_100_Hotels"
 token_dict = {}
 stopwords = nltk.corpus.stopwords.words('english')
 stemmer = PorterStemmer()
 document_names = []
 
-# Tokenize, Stem and remove stopwords
+# Function to tokenize, stem, and remove stopwords from input text
 def tokenize_and_stem_and_removestopwords(input_text):  
     tokens = [word for sent in nltk.sent_tokenize(input_text) for word in nltk.word_tokenize(sent)]
     filtered_stopwords = [w for w in tokens if w not in stopwords]
@@ -29,8 +29,7 @@ def tokenize_and_stem_and_removestopwords(input_text):
     stems = [stemmer.stem(t) for t in filtered_tokens]
     return stems
 
-
-# K-means clustering
+# Function to perform K-means clustering on TF-IDF vectors
 def k_means(tfidfvector, numofclusters):
     cluster_id = []
     doc_id_per_cluster = []
@@ -47,7 +46,7 @@ def k_means(tfidfvector, numofclusters):
                 doc_id_per_cluster[i].append(k)
     return clusters, cluster_id, doc_id_per_cluster
 
-
+# Function to display clustering results
 def show_result(result_array, clustercounts):
     print("**There are ", len(result_array[0]), " documents in TripAdvisor data collection**")
     print("**The data collection is clustered in ", clustercounts, "clusters as shown in below**")
@@ -61,7 +60,7 @@ def show_result(result_array, clustercounts):
         print()
         print("==================")
 
-
+# Function to draw clustering visualization and dendrogram
 def draw_shape(a, b, c, d):
     dist = 1 - cosine_similarity(c)
     mds = MDS(n_components=2, dissimilarity="precomputed", random_state=1)
@@ -72,7 +71,7 @@ def draw_shape(a, b, c, d):
     prefix = "cluster_"
     for i in range(0, d):
         cluster_colors.append(colorize())
-        cluster_names.append(prefix+str(i))
+        cluster_names.append(prefix + str(i))
     df = pd.DataFrame(dict(x=xs, y=ys, label=a, title=b))
     groups = df.groupby('label')
     fig, ax = plt.subplots(figsize=(17, 9))  # set size
@@ -96,11 +95,11 @@ def draw_shape(a, b, c, d):
     ax.legend(numpoints=1)  # show legend with only 1 point
     # add label in x,y position with the label as the film title
     for i in range(len(df)):
-        ax.text(df.ix[i]['x'], df.ix[i]['y'], df.ix[i]['title'], size=5)
+        ax.text(df.iloc[i]['x'], df.iloc[i]['y'], df.iloc[i]['title'], size=5)  # Updated from deprecated df.ix to df.iloc
     plt.show()
     plt.close()
 
-    # dendrogram plot
+    # Dendrogram plot
     linkage_matrix = ward(dist)  # define the linkage_matrix using ward clustering pre-computed distances
     fig, ax = plt.subplots(figsize=(15, 20))  # set size
     ax = dendrogram(linkage_matrix, orientation="top", labels=document_names, leaf_font_size=6)
@@ -114,12 +113,12 @@ def draw_shape(a, b, c, d):
     plt.close()
     return True
 
-
+# Function to generate random colors for clusters
 def colorize():
     r = lambda: random.randint(0, 255)
     return '#%02X%02X%02X' % (r(), r(), r())
 
-# iterate throw data collection
+# Iterate through the data collection to load and preprocess documents
 for subdir, dirs, files in os.walk(path):
     for file in files:
         file_path = subdir + os.path.sep + file
@@ -131,6 +130,7 @@ for subdir, dirs, files in os.walk(path):
         no_punctuation = lowers.translate(string.punctuation)
         token_dict[file] = no_punctuation
 
+# User input for number of clusters
 flag = True
 ans_1 = input("Please enter number of clusters(k for k-means): ")
 while flag:
@@ -139,11 +139,16 @@ while flag:
         flag = False
     except ValueError:
         print("That's not an int!")
+
+# Perform TF-IDF vectorization and K-means clustering
 tfidf = TfidfVectorizer(tokenizer=tokenize_and_stem_and_removestopwords, stop_words='english', ngram_range=(1, 2))
 tfs = tfidf.fit_transform(token_dict.values())
 result = k_means(tfs, int(ans_1))
 show_result(result, int(ans_1))
+
+# User input for visualization
 ans_2 = input("Do you want to see clustering visual shapes? y or n: ")
 if ans_2 == "y":
     draw_shape(result[0], document_names, tfs, int(ans_1))
+
 # THE END
